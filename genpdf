@@ -1,14 +1,20 @@
 #!/usr/bin/env node
 
+const fs = require('fs');
 const PdfPrinter = require('pdfmake');
 const fonts = require('./font-config').fonts;
 var printer = new PdfPrinter(fonts);
-var fs = require('fs');
+
+const inFn = process.argv[2];
+const outFn = inFn + ".pdf";
+
+const rawData = fs.readFileSync(process.argv[2], null);
+const text = rawData.toString('base64');
 
 var docDefinition = {
   content: [
-    'First paragraph',
-    'Another paragraph, this time a little bit longer to make sure, this line will be divided into at least two lines',
+    'Your paperback backup:',
+    { qr: text, eccLevel: 'M' },
   ],
   defaultStyle: {
     font: 'Helvetica'
@@ -16,6 +22,6 @@ var docDefinition = {
 };
 
 var pdfDoc = printer.createPdfKitDocument(docDefinition);
-pdfDoc.pipe(fs.createWriteStream('document.pdf'));
+pdfDoc.pipe(fs.createWriteStream(outFn));
 pdfDoc.end();
 
