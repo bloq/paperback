@@ -14,21 +14,24 @@ const text = rawData.toString('base64');
 const dnow = new Date();
 
 var docDefinition = {
-  info: {
-    title: 'Paperback Backup ' + dnow.toISOString(),
-  },
+    info: {
+        title: 'Paperback Backup ' + dnow.toISOString(),
+    },
 
-  pageSize: 'LETTER',
+    pageSize: 'LETTER',
 
-  content: [
-    'Your Paperback Backup',
-    'PAGE 1 of 1',
-    { qr: text, eccLevel: 'M' },
-  ],
+    content: [
+        'Your Paperback Backup',
+        'PAGE 1 of 1',
+        {
+            qr: text,
+            eccLevel: 'M'
+        },
+    ],
 
-  defaultStyle: {
-    font: 'Helvetica'
-  }
+    defaultStyle: {
+        font: 'Helvetica'
+    }
 };
 
 var pdfDoc = printer.createPdfKitDocument(docDefinition);
