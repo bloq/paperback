@@ -8,3 +8,19 @@ Software to assist in digital data backup to... dead tree paper.
 * node v8, npm, and `npm install` dependencies in `package.json`
 * Ubuntu packages:  qrencode, zbar-tools
 
+# Limitations
+
+Only small files may be encoded.   500 bytes per page.
+
+# Usage
+
+Backup binary file to PDF:
+```
+$ ./genpdf binary500.dat binary500.dat.pdf
+```
+
+Restore binary file from PDF backup:
+```
+$ ./qrpdf2bin binary500.dat.pdf > binary500.dat
+```
+
