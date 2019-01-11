@@ -34,11 +34,10 @@ function writePdf(inFn, outFn) {
         pageSize: 'LETTER',
 
         content: [{
-                text: `Paperback ${nowStr}`,
-                style: 'centered'
-            },
-            {
-                text: 'PAGE 1 of 1',
+                stack: [
+		    `Paperback ${nowStr}`,
+                    'PAGE 1 of 1',
+		],
                 style: 'centered'
             },
             {
