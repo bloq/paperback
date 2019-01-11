@@ -1,56 +1,65 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
+const program = require('commander');
 const PdfPrinter = require('pdfmake');
 const fonts = require('./font-config').fonts;
 var printer = new PdfPrinter(fonts);
 
 const VERSION = require('./package').version;
 
-const inFn = process.argv[2];
-const outFn = inFn + ".pdf";
+program
+    .version(VERSION)
+    .arguments('<inFile> <outPdf>')
+    .action(function(inFile, outPdf) {
+        writePdf(inFile, outPdf);
+    });
 
-const rawData = fs.readFileSync(process.argv[2], null);
-const text = rawData.toString('base64');
+program.parse(process.argv);
 
-const dnow = new Date();
-const nowStr = dnow.toISOString();
+function writePdf(inFn, outFn) {
+    const rawData = fs.readFileSync(inFn, null);
+    const text = rawData.toString('base64');
 
-var docDefinition = {
-    info: {
-        title: `Paperback ${nowStr}`,
-        creator: `Paperback v${VERSION}`,
-        producer: `Paperback v${VERSION}`,
-    },
+    const dnow = new Date();
+    const nowStr = dnow.toISOString();
 
-    pageSize: 'LETTER',
-
-    content: [{
-            text: `Paperback ${nowStr}`,
-            style: 'centered'
+    var docDefinition = {
+        info: {
+            title: `Paperback ${nowStr}`,
+            creator: `Paperback v${VERSION}`,
+            producer: `Paperback v${VERSION}`,
         },
-        {
-            text: 'PAGE 1 of 1',
-            style: 'centered'
-        },
-        {
-            qr: text,
-            eccLevel: 'M'
-        },
-    ],
 
-    defaultStyle: {
-        font: 'Helvetica'
-    },
-    styles: {
-        centered: {
-            font: 'Helvetica',
-            alignment: 'center',
-        },
-    },
-};
+        pageSize: 'LETTER',
 
-var pdfDoc = printer.createPdfKitDocument(docDefinition);
-pdfDoc.pipe(fs.createWriteStream(outFn));
-pdfDoc.end();
+        content: [{
+                text: `Paperback ${nowStr}`,
+                style: 'centered'
+            },
+            {
+                text: 'PAGE 1 of 1',
+                style: 'centered'
+            },
+            {
+                qr: text,
+                eccLevel: 'M'
+            },
+        ],
+
+        defaultStyle: {
+            font: 'Helvetica'
+        },
+        styles: {
+            centered: {
+                font: 'Helvetica',
+                alignment: 'center',
+            },
+        },
+    };
+
+    var pdfDoc = printer.createPdfKitDocument(docDefinition);
+    pdfDoc.pipe(fs.createWriteStream(outFn));
+    pdfDoc.end();
+}
 

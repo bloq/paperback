@@ -1,6 +1,6 @@
 {
   "name": "paperback",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Paper backups for digital assets",
   "main": "index.js",
   "scripts": {
@@ -9,6 +9,7 @@
   "author": "Jeff Garzik <jeff@bloq.com>",
   "license": "MIT",
   "dependencies": {
+    "commander": "^2.19.0",
     "pdfmake": "^0.1.40"
   }
 }
