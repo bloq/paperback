@@ -10,7 +10,8 @@ Software to assist in digital data backup to... dead tree paper.
 
 # Limitations
 
-Only small files may be encoded.   500 bytes per page.
+* Only small files may be encoded.   500 bytes per page.
+* Only one PDF page at present, therefore 500 bytes maximum (limitation being removed soon).
 
 # Usage
 
