@@ -11,11 +11,21 @@ const outFn = inFn + ".pdf";
 const rawData = fs.readFileSync(process.argv[2], null);
 const text = rawData.toString('base64');
 
+const dnow = new Date();
+
 var docDefinition = {
+  info: {
+    title: 'Paperback Backup ' + dnow.toISOString(),
+  },
+
+  pageSize: 'LETTER',
+
   content: [
-    'Your paperback backup:',
+    'Your Paperback Backup',
+    'PAGE 1 of 1',
     { qr: text, eccLevel: 'M' },
   ],
+
   defaultStyle: {
     font: 'Helvetica'
   }
