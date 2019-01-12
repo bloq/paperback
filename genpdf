@@ -10,16 +10,62 @@ const VERSION = require('./package').version;
 
 program
     .version(VERSION)
+    .description('Backup digital data to paper (via PDF)')
+    .option('--ocr', 'Output text input in OCR friendly font (default: output QR code)')
     .arguments('<inFile> <outPdf>')
     .action(function(inFile, outPdf) {
         writePdf(inFile, outPdf);
     });
 
 program.parse(process.argv);
+if (!program.args.length) program.help();
+
+function genOcrContent(nowStr, textLines) {
+    const header = [{
+        stack: [
+            `Paperback ${nowStr}`,
+        ],
+        style: 'centered'
+    }, ];
+
+    return header.concat(textLines);
+}
+
+function genQrContent(nowStr, text) {
+    return [{
+            stack: [
+                `Paperback ${nowStr}`,
+                'PAGE 1 of 1',
+            ],
+            style: 'centered'
+        },
+        {
+            qr: text,
+            eccLevel: 'M'
+        },
+    ];
+}
 
 function writePdf(inFn, outFn) {
-    const rawData = fs.readFileSync(inFn, null);
-    const text = rawData.toString('base64');
+    var text = null;
+    var textLines = [];
+    if (program.ocr) {
+        text = fs.readFileSync(inFn, 'utf8');
+        textLines = text.split(/\r?\n/);
+
+        // trim trailing blank lines
+        const rx = /^\s*$/;
+        while (textLines.length > 0) {
+            const lastLine = textLines[textLines.length - 1];
+            if (rx.test(lastLine))
+                textLines.pop();
+            else
+                break;
+        }
+    } else {
+        const rawData = fs.readFileSync(inFn, null);
+        text = rawData.toString('base64');
+    }
 
     const dnow = new Date();
     const nowStr = dnow.toISOString();
@@ -33,19 +79,6 @@ function writePdf(inFn, outFn) {
 
         pageSize: 'LETTER',
 
-        content: [{
-                stack: [
-		    `Paperback ${nowStr}`,
-                    'PAGE 1 of 1',
-		],
-                style: 'centered'
-            },
-            {
-                qr: text,
-                eccLevel: 'M'
-            },
-        ],
-
         defaultStyle: {
             font: 'Helvetica'
         },
@@ -56,6 +89,15 @@ function writePdf(inFn, outFn) {
             },
         },
     };
+
+    if (program.ocr) {
+        docDefinition.content = genOcrContent(nowStr, textLines);
+        docDefinition.defaultStyle = {
+	    font: 'Courier',
+	    bold: true,
+	};
+    } else
+        docDefinition.content = genQrContent(nowStr, text);
 
     var pdfDoc = printer.createPdfKitDocument(docDefinition);
     pdfDoc.pipe(fs.createWriteStream(outFn));
